@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Where's My Bus</title>
+  <style>
+    /* CSS styles for the interface */
+
+    body {
+      background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20220428/pngtree-city-public-transport-infrastructure-image_1107196.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: top;
+      font-family: Georgia, Serif;
+      color: #000000;
+      margin: 0;
+      padding: 0;
+    }
+#header {
+      background-color: #87CEEB;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+	color: #1D4172;
+      text-align: center;
+    }
+
+    .bus-route-select {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .bus-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .bus-list li {
+      margin-bottom: 10px;
+      background-color: #f2f2f2;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .bus-list li:hover {
+      background-color: #ddd;
+    }
+
+    #bus-details {
+      display: none;
+    }
+
+    #map {
+      height: 400px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Where's My Bus</h1>
+
+  <div class="bus-route-select">
+    <label for="route-select">Select a bus route:</label>
+    <select id="route-select">
+      <option value="">Select Route</option>
+      <option value="route1">Route 1</option>
+      <option value="route2">Route 2</option>
+      <!-- Add more options for other routes -->
+    </select>
+  </div>
+
+  <ul id="bus-list" class="bus-list"></ul>
+
+  <div id="bus-details">
+    <h2>Bus Details</h2>
+    <p>Time for Arrival: <span id="arrival-time"></span></p>
+    <p>Passenger Count: <span id="passenger-count"></span></p>
+    <div id="map"></div>
+  </div>
+
+  <script>
+    // JavaScript code for retrieving and displaying bus data
+
+    // Function to retrieve bus data from ThingSpeak server
+    function getBusData(route) {
+      // Make an API call to retrieve bus data based on the selected route
+      // You'll need to implement this using AJAX or fetch() to communicate with the ThingSpeak server
+      // The response should be an array of bus objects containing details like time for arrival, passenger count, and current location
+      // For example:
+      const busData = [
+        {
+          id: 1,
+          time: "10:30 AM",
+          time2: "11:30 PM",
+          passengers: 25,
+          location: { lat: 37.7749, lng: -122.4194 }
+        },
+        {
+          id: 2,
+          time: "11:15 AM",
+          time: "12:15 PM",
+          passengers: 32,
+          location: { lat: 37.7749, lng: -122.4316 }
+        }
+       
+        // Add more bus objects for the selected route
+      ];
+
+      return Promise.resolve(busData);
+    }
+
+    // Function to display the list of buses
+    function displayBuses(buses) {
+      const busList = document.getElementById("bus-list");
+      busList.innerHTML = "";
+
+      buses.forEach(bus => {
+        const listItem = document.createElement("li");
+        listItem.textContent = "Bus " + bus.id;
+        listItem.addEventListener("click", () => showBusDetails(bus));
+        busList.appendChild(listItem);
+      });
+    }
+
+    // Function to show the details of a selected bus
+    function showBusDetails(bus) {
+      const arrivalTime = document.getElementById("arrival-time");
+      const passengerCount = document.getElementById("passenger-count");
+      
+      arrivalTime.textContent = bus.time;
+      passengerCount.textContent = bus.passengers;
+
+      // Show the map with the current location
+      const map = new google.maps.Map(document.getElementById("map"), {
+        center: bus.location,
+        zoom: 12
+      });
+
+      new google.maps.Marker({
+        position: bus.location,
+        map: map,
+        title: "Bus " + bus.id
+      });
+
+      // Show the bus details section
+      const busDetails = document.getElementById("bus-details");
+      busDetails.style.display = "block";
+    }
+
+    // Event listener for the bus route select
+    const routeSelect = document.getElementById("route-select");
+    routeSelect.addEventListener("change", () => {
+      const selectedRoute = routeSelect.value;
+
+      if (selectedRoute) {
+        getBusData(selectedRoute)
+          .then(buses => displayBuses(buses))
+          .catch(error => console.log("Error:", error));
+      } else {
+        // Clear the bus list and hide the details section
+        const busList = document.getElementById("bus-list");
+        const busDetails = document.getElementById("bus-details");
+
+        busList.innerHTML = "";
+        busDetails.style.display = "none";
+      }
+    });
+
+    // Redirect to another page when Bus 1 is selected
+    const busList = document.getElementById("bus-list");
+    busList.addEventListener("click", event => {
+      if (event.target.textContent === "Bus 1") {
+        window.location.href = "https://where-is-my-bus.blogspot.com/";
+      }
+    });
+  </script>
+  <!-- Include the Google Maps API script -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpy78Y8rww7LqYMkoaJi8SqjFTLGHg9go&libraries=places"></script>
+</body>
+</html>
